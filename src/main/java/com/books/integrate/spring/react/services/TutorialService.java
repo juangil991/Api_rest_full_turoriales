@@ -102,11 +102,6 @@ public class TutorialService {
         }
     }
 
-    /**
-     * elimina tutoriales por nombre, elimina tambien todos los que tienen el mismo nombre o contienen el mismo nombre
-     * @param title titulo a eliminar
-     * @return retorna el estado de la operacion
-     */
     public ResponseEntity<HttpStatus> deleteTutorialsByTitle(String title) {
         try{
         ResponseEntity<List<Tutorial>>titles=getAllTutorials(title);
@@ -115,6 +110,29 @@ public class TutorialService {
         });
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }catch (Exception ex){
+            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+    public ResponseEntity<HttpStatus> updateTutorialsByTitle(String title,Tutorial tutorial){
+        try {
+            ResponseEntity<List<Tutorial>> titles = getAllTutorials(title);
+            titles.getBody().forEach(tutorials -> {
+                updateTutorial(tutorials.getId(), tutorial);
+            });
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (Exception ex){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    public ResponseEntity<List<Tutorial>> findByPrice(int price) {
+        try {
+            List<Tutorial> tutorials = tutorialRepository.findByPrice(price);
+
+            if (tutorials.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(tutorials, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
         }
     }

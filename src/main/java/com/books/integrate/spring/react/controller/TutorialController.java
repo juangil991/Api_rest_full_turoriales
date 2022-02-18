@@ -53,6 +53,10 @@ public class TutorialController {
 	public ResponseEntity<Tutorial> updateTutorials(@PathVariable("id") long id, @RequestBody Tutorial tutorial) {
 		return tutorialService.updateTutorial(id,tutorial);
 	}
+	@PutMapping("/tutorials/query")
+	public ResponseEntity<HttpStatus> updateTutorials(@RequestParam("title") String title, @RequestBody Tutorial tutorial) {
+		return tutorialService.updateTutorialsByTitle(title,tutorial);
+	}
 
 //HttpStatus
 	@DeleteMapping("/tutorials/{id}")
@@ -72,5 +76,9 @@ public class TutorialController {
 	@GetMapping("/tutorials/published")
 	public ResponseEntity<List<Tutorial>> findPublisheds() {
 		return tutorialService.findByPublished();
+	}
+	@GetMapping("/tutorials/price/{price}")
+	public ResponseEntity<List<Tutorial>> findPrice(@PathVariable("price")int price) {
+		return tutorialService.findByPrice(price);
 	}
 }
