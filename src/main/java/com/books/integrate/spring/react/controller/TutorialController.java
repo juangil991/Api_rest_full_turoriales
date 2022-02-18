@@ -3,6 +3,7 @@ package com.books.integrate.spring.react.controller;
 import java.util.*;
 
 import com.books.integrate.spring.react.model.Tutorial;
+import com.books.integrate.spring.react.services.TutorialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMessage;
 import org.springframework.http.HttpStatus;
@@ -26,100 +27,46 @@ import com.books.integrate.spring.react.repository.TutorialRepository;
 public class TutorialController {
 
 	@Autowired
-	TutorialRepository tutorialRepository;
+    TutorialService tutorialService;
 
 	@GetMapping("/tutorials")
-	public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
-		try {
-			List<Tutorial> tutorials = new ArrayList<Tutorial>();
-
-			if (title == null)
-				tutorialRepository.findAll().forEach(tutorials::add);
-			else
-				tutorialRepository.findByTitleContaining(title).forEach(tutorials::add);
-
-			if (tutorials.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			}
-
-			return new ResponseEntity<>(tutorials, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+    public ResponseEntity<List<Tutorial>>allTutorials(@RequestParam(required = false) String title){
+        return tutorialService.getAllTutorials(title);
+    }
+	@GetMapping("/tutorials/query")
+	public ResponseEntity<List<Tutorial>>allTutorialsTitle(@RequestParam("title") String title){
+		return tutorialService.getAllTutorials(title);
 	}
 
 	@GetMapping("/tutorials/{id}")
-	public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") long id) {
-		Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
-
-		if (tutorialData.isPresent()) {
-			return new ResponseEntity<>(tutorialData.get(), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+	public ResponseEntity<Tutorial> getTutorial(@PathVariable("id") Long id){
+		return tutorialService.getTutorialById(id);
 	}
 
 
 	@PostMapping("/tutorials")
-	public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
-		try {
-			Tutorial _tutorial = tutorialRepository
-					.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(),  false));
-			return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
-		}
+	public ResponseEntity<Tutorial> addTutorial(@RequestBody Tutorial tutorial) {
+		return tutorialService.createTutorial(tutorial);
 	}
 
 	@PutMapping("/tutorials/{id}")
-	public ResponseEntity<Tutorial> updateTutorial(@PathVariable("id") long id, @RequestBody Tutorial tutorial) {
-		Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
-
-		if (tutorialData.isPresent()) {
-			Tutorial _tutorial = tutorialData.get();
-			_tutorial.setTitle(tutorial.getTitle());
-			_tutorial.setDescription(tutorial.getDescription());
-			_tutorial.setPublished(tutorial.isPublished());
-			return new ResponseEntity<>(tutorialRepository.save(_tutorial), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+	public ResponseEntity<Tutorial> updateTutorials(@PathVariable("id") long id, @RequestBody Tutorial tutorial) {
+		return tutorialService.updateTutorial(id,tutorial);
 	}
 
 //HttpStatus
 	@DeleteMapping("/tutorials/{id}")
-	public ResponseEntity<String> deleteTutorial(@PathVariable("id") long id) {
-		try {
-			tutorialRepository.deleteById(id);
-				return new ResponseEntity<>("Tutorials DELETE!! ",HttpStatus.NO_CONTENT);
-			} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
-		}
+	public ResponseEntity<String> deleteTurorialById(@PathVariable("id") long id) {
+		return tutorialService.deleteTutorial(id);
 	}
 
 	@DeleteMapping("/tutorials")
-	public ResponseEntity<HttpStatus> deleteAllTutorials() {
-		try {
-			tutorialRepository.deleteAll();
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
-		}
-
+	public ResponseEntity<HttpStatus> deleteTutorials() {
+		return tutorialService.deleteAllTutorials();
 	}
 
 	@GetMapping("/tutorials/published")
-	public ResponseEntity<List<Tutorial>> findByPublished() {
-		try {
-			List<Tutorial> tutorials = tutorialRepository.findByPublished(true);
-
-			if (tutorials.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			}
-			return new ResponseEntity<>(tutorials, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
-		}
+	public ResponseEntity<List<Tutorial>> findPublisheds() {
+		return tutorialService.findByPublished();
 	}
-
 }
