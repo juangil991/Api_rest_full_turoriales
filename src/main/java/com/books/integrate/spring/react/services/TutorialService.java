@@ -53,7 +53,7 @@ public class TutorialService {
     public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
         try {
             Tutorial _tutorial = tutorialRepository
-                    .save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(),  false));
+                    .save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(), tutorial.getPrice(), false));
             return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
@@ -66,6 +66,7 @@ public class TutorialService {
             tutorialData.getBody().setTitle(tutorial.getTitle());
             tutorialData.getBody().setDescription(tutorial.getDescription());
             tutorialData.getBody().setPublished(tutorial.isPublished());
+            tutorialData.getBody().setPrice(tutorial.getPrice());
             tutorialRepository.save(tutorialData.getBody());
         }
         return tutorialData;
@@ -100,6 +101,12 @@ public class TutorialService {
             return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
         }
     }
+
+    /**
+     * elimina tutoriales por nombre, elimina tambien todos los que tienen el mismo nombre o contienen el mismo nombre
+     * @param title titulo a eliminar
+     * @return retorna el estado de la operacion
+     */
     public ResponseEntity<HttpStatus> deleteTutorialsByTitle(String title) {
         try{
         ResponseEntity<List<Tutorial>>titles=getAllTutorials(title);
