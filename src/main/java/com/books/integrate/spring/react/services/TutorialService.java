@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -98,10 +100,15 @@ public class TutorialService {
             return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
         }
     }
-    public ResponseEntity<List<Tutorial>> findByTitleContaining(String title){
-        List<Tutorial> titles= tutorialRepository.findByTitleContaining(title);
-        if(titles.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }else return new ResponseEntity<>(titles, HttpStatus.OK);
+    public ResponseEntity<HttpStatus> deleteTutorialsByTitle(String title) {
+        try{
+        ResponseEntity<List<Tutorial>>titles=getAllTutorials(title);
+        titles.getBody().forEach(tutorial -> {
+            deleteTutorial(tutorial.getId());
+        });
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (Exception ex){
+            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+        }
     }
 }

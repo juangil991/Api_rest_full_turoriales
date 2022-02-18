@@ -64,6 +64,10 @@ public class TutorialController {
 	public ResponseEntity<HttpStatus> deleteTutorials() {
 		return tutorialService.deleteAllTutorials();
 	}
+	@DeleteMapping("/tutorials/query")
+	public ResponseEntity<HttpStatus> deleteTitle(@RequestParam("title")String title) {
+		return tutorialService.deleteTutorialsByTitle(title);
+	}
 
 	@GetMapping("/tutorials/published")
 	public ResponseEntity<List<Tutorial>> findPublisheds() {
